@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 
 const reviewSchema = mongoose.Schema({
 
-    user: String,
+    username: String,
     movieId: String,
     rating: Number,
     text: String

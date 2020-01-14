@@ -10,8 +10,13 @@ const bodyParser = require('body-parser');
 
 require('dotenv/config');
 
+const createToken = require('./webtoken/webtoken');
+
+const comparePassword = require('./password/verifypassword')
+
 const User = require('./models/user');
 const Review = require('./models/review');
+
 
 
 
@@ -22,7 +27,7 @@ mongoose.connect(process.env.MONGO, {
   useUnifiedTopology: true
 }).catch(err => {
 
-  console.log(err)
+  
 
 }).then(e => {
 
@@ -55,7 +60,132 @@ app.get('/movie', function (req, res) {
   .catch()
   
 })
+
+
+
+/* ----------- Check and Create Account -------------- */
+
+app.post('/create', function (req, res) {
+
+
+  var username = req.body.params.username;
+  var password = req.body.params.password;
+
+  // find user
+  User.find({username: username})
+  .then(response => {
+
+    // if not found
+    if (response.length === 0) {
  
+      const user = new User({
+
+        username: username,
+        password: password
+
+      })
+
+      // save user
+      user.save()
+      .then(() => {
+
+        //create webtoken
+        createToken(username)
+        .then(tok => {
+
+          res.send({
+            type: "success",
+            username: username,
+            token: tok
+          })
+  
+          })
+        .catch(err => {
+          res.send("error")
+        })
+
+
+        })
+        .catch()
+
+      
+    }
+
+    // if found 
+    else {
+
+      res.send("found")
+
+    }
+
+  })
+  .catch(err => {
+
+  })
+  
+})
+ 
+
+
+/* ----------- Login and check password -------------- */
+
+app.post('/login', function (req, res) {
+
+
+  var username = req.body.params.username;
+  var password = req.body.params.password;
+
+  // find user
+  User.find({username: username})
+  .then(res1 => {
+
+    // user not found
+    if (res1.length === 0) {
+
+      res.send("no")
+
+    }
+
+    // user found
+    else if (res1.length !== 0) {
+    
+      var hash = res1[0].password;
+      
+      // check password
+      comparePassword(password, hash)
+      .then(res2 => {
+        
+        // password true
+        if (res2 === true) {
+
+          createToken(username)
+          .then(res3 => {
+
+            res.send({
+              type: "success",
+              token: res3
+            })
+
+          })
+
+        }
+
+        // password false
+        else if (res2 === false) {
+
+          res.send("no");
+
+        }
+
+      })
+
+    }
+
+  }) 
+
+})
+
+
 
 
 
@@ -63,19 +193,5 @@ app.listen(8080);
 
 
 
-
-/*
-const user = new User({
-
-  name: "kerde",
-  password: "moimoi"
-
-})
-
-user.save()
-.then(res => {
-  console.log(res)
-});
-*/
 
 
