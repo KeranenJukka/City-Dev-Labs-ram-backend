@@ -11,6 +11,7 @@ const bodyParser = require('body-parser');
 require('dotenv/config');
 
 const createToken = require('./webtoken/webtoken');
+const verifyToken = require('./webtoken/webtoken2');
 
 const comparePassword = require('./password/verifypassword')
 
@@ -48,7 +49,7 @@ app.get('/movie', function (req, res) {
   
   var id = req.query.id;
 
-  Review.find({movieId: id})
+  Review.find({movieid: id})
   .then(response => {
     
     var json = JSON.stringify(response);
@@ -186,7 +187,46 @@ app.post('/login', function (req, res) {
 })
 
 
+/* ----------- Login and check password -------------- */
 
+app.post('/review', function (req, res) {
+
+  var token = req.body.params.token;
+
+  verifyToken(token)
+  .then(res1 => {
+
+    var username = req.body.params.username;
+    var movieid = req.body.params.movieid;
+    var rating = req.body.params.rating;
+    var text = req.body.params.text;
+
+    const review = new Review({
+
+      username: username,
+      movieid: movieid,
+      rating: rating,
+      text: text
+
+    })
+
+    review.save()
+    .then(res2 => {
+
+      res.send("success");
+
+    })
+
+
+  })
+  .catch (err => {
+
+    res.send("no")
+
+  })
+
+
+ })
 
 
 app.listen(8080);
