@@ -21,7 +21,7 @@ const Review = require('./models/review');
 
 
 
-/* --------- MongoDB ------------ */
+/* ------------ MongoDB -------------- */
 
 mongoose.connect(process.env.MONGO, {
   useNewUrlParser: true,
@@ -50,9 +50,9 @@ app.get('/movie', function (req, res) {
   var id = req.query.id;
 
   Review.find({movieid: id})
-  .then(response => {
+  .then(res1 => {
     
-    var json = JSON.stringify(response);
+    var json = JSON.stringify(res1);
 
     res.send(json)
     
@@ -74,10 +74,10 @@ app.post('/create', function (req, res) {
 
   // find user
   User.find({username: username})
-  .then(response => {
+  .then(res1 => {
 
     // if not found
-    if (response.length === 0) {
+    if (res1.length === 0) {
  
       const user = new User({
 
@@ -193,10 +193,12 @@ app.post('/review', function (req, res) {
 
   var token = req.body.params.token;
 
+  // check token
   verifyToken(token)
   .then(res1 => {
 
-    var username = req.body.params.username;
+
+    var username = res1.data;
     var movieid = req.body.params.movieid;
     var rating = req.body.params.rating;
     var text = req.body.params.text;
@@ -210,8 +212,9 @@ app.post('/review', function (req, res) {
 
     })
 
+    // save review
     review.save()
-    .then(res2 => {
+    .then(() => {
 
       res.send("success");
 
@@ -227,6 +230,67 @@ app.post('/review', function (req, res) {
 
 
  })
+
+
+
+/* ----------- Get my Reviews -------------- */
+
+app.get('/myreviews', function (req, res) {
+
+  
+
+  // check token
+  verifyToken(req.query.token)
+  .then(res1 => {
+
+    // find reviews
+    Review.find({username: res1.data})
+    .then(res2 => {
+
+      res.send(res2)
+
+    })
+
+  }).
+  catch(err => {
+
+    res.send("no")
+
+  })
+ 
+
+ })
+
+
+
+ /* ----------- Delete Review -------------- */
+
+ app.delete('/deletereview', function (req, res) { 
+
+  // verify token
+  verifyToken(req.query.token)
+  .then(res1 => {
+
+    // delete review
+    Review.deleteOne({_id: req.query.id})
+    .then(res2 => {
+
+      res.send("success")
+
+    })
+
+
+  })
+  .catch(err => {
+
+    res.send("no")
+
+  })
+
+
+
+ })
+
 
 
 app.listen(8080);
