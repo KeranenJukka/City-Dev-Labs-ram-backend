@@ -1,5 +1,5 @@
 
-
+require('dotenv').config();
 
 const express = require('express')
 const app = express()
@@ -8,8 +8,6 @@ const mongoose = require('mongoose');
  
 const bodyParser = require('body-parser');
 
-require('dotenv').config();
-
 const createToken = require('./webtoken/webtoken');
 const verifyToken = require('./webtoken/webtoken2');
 
@@ -17,7 +15,6 @@ const comparePassword = require('./password/verifypassword')
 
 const User = require('./models/user');
 const Review = require('./models/review');
-
 
 
 
