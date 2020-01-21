@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
  
 const bodyParser = require('body-parser');
 
-require('dotenv/config');
+require('dotenv').config();
 
 const createToken = require('./webtoken/webtoken');
 const verifyToken = require('./webtoken/webtoken2');
@@ -18,6 +18,16 @@ const comparePassword = require('./password/verifypassword')
 const User = require('./models/user');
 const Review = require('./models/review');
 
+
+
+
+/*-------------- Serve the site ------------------*/
+
+app.use(express.static('thesite'));
+
+app.get('/', function (req, res) {
+  res.sendFile('index.html');
+});
 
 
 
@@ -45,7 +55,7 @@ app.use(bodyParser.json());
 
 /* ----------- Get Reviews -------------- */
 
-app.get('/movie', function (req, res) {
+app.get('/getmovie', function (req, res) {
   
   var id = req.query.id;
 
@@ -130,7 +140,7 @@ app.post('/create', function (req, res) {
 
 /* ----------- Login and check password -------------- */
 
-app.post('/login', function (req, res) {
+app.post('/loginuser', function (req, res) {
 
 
   var username = req.body.params.username;
@@ -235,7 +245,7 @@ app.post('/review', function (req, res) {
 
 /* ----------- Get my Reviews -------------- */
 
-app.get('/myreviews', function (req, res) {
+app.get('/getmyreviews', function (req, res) {
 
   
 
@@ -288,12 +298,10 @@ app.get('/myreviews', function (req, res) {
   })
 
 
-
  })
 
 
-
-app.listen(8080);
+app.listen(30000);
 
 
 

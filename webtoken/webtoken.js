@@ -1,7 +1,7 @@
 
 var jwt = require('jsonwebtoken');
 
-
+require('dotenv').config();
 
 
 async function createToken (user) {
@@ -10,7 +10,7 @@ var token =
 
     jwt.sign({
         data: user
-      }, 'secret', { expiresIn: '1h' });
+      }, process.env.SECRET, { expiresIn: '1h' });
 
 return token;
 
