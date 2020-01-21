@@ -301,7 +301,9 @@ app.get('/getmyreviews', function (req, res) {
  })
 
 
-app.listen(30000);
+const port = process.env.PORT || 8080;
+
+app.listen(port);
 
 
 
